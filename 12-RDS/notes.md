@@ -251,6 +251,7 @@ READ performance
 - This allows you to scale out read operations for an instance
 - Read-replicas can chain, but lag will become a problem
 - Can provide global performance improvements
+- Can be setup as MultiAZ for Disaster Recoery
 
 Availability Improvements
 
@@ -263,6 +264,25 @@ Availability Improvements
 to snapshots and backups
 - Promotion cannot be reversed
 - Global availability improvements provides global resilience
+
+RDS Read Replica - Network Cost
+ - In Aws threre is network cost when data goes frome one AZ to another for 
+ - Cross AZ and Cross region replica will incur costs
+
+RDS Multi AZ ( Disaster Recovery)
+- SYNC Replication 
+- One DNS name - automatic app failover to standby 
+- Not used for scaling
+
+RDS Security
+- At Rest Encryption (master and read) with AWS KMS - 256 at launch time 
+- Master not encrypted then read replica cannot be encrypted
+- TDE (Transparent Data Encryption available for Oracle and SQL Server
+- SSL certificated to provide in flight encryption
+- rds.force_ssl=1 in Psql and GRANT usage on *.* to mysqluser@'%' Require SSL in mysql
+- unencrypted snapshot --->copy enable encryption --> encrypted snapshot --> restore from encrypted --> migrated application to point to restored encrypted snapshot
+- Mysql and psotgresSQL IAM DB authetication need and authentication token obtained trough API call and has liftime of 15 min 
+- IAM to centrally manage users instead of DB when using IAM authentication
 
 ### Amazon Aurora
 
