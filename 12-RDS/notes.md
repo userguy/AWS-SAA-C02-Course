@@ -480,3 +480,22 @@ Need to define the source and destination endpoints. These point at the
 physical source and target databases.
 
 One endpoint MUST be on AWS.
+
+### ElastiCache Overview
+
+ElastiCache is to get managed Redis or Memcached
+Cache are in memory DB with really high performance, low latency 
+Helps reduce load off of database for read write intensive workloads
+helps make your application stateless
+MultiAZ with failover capability
+Does not Support IAM Authetication
+SSL in flight Encryption
+
+Use Case like - Relive Load of Database by caching and storing user session store 
+Redis - Backup and Restore, Read Replicas to scale reads
+Memcached - Multinode for sharding, Non Persistent , No Backup and Restore 
+
+Patterns for ElastiCache:
+Lazy Loading - all read data is cached, data can become stale in cache
+Write Trough - Adds or update data in cache when written to DB 
+Session Store - Store temporary session data in cache( Using TTL features) 
