@@ -280,7 +280,7 @@ RDS Security
 - TDE (Transparent Data Encryption available for Oracle and SQL Server
 - SSL certificated to provide in flight encryption
 - rds.force_ssl=1 in Psql and GRANT usage on *.* to mysqluser@'%' Require SSL in mysql
-- unencrypted snapshot --->copy enable encryption --> encrypted snapshot --> restore from encrypted --> migrated application to point to restored encrypted snapshot
+- unencrypted snapshot --->copy --> enable encryption --> encrypted snapshot --> restore from encrypted --> migrated application --> restored encrypted snapshot
 - Mysql and psotgresSQL IAM DB authetication need and authentication token obtained trough API call and has liftime of 15 min 
 - IAM to centrally manage users instead of DB when using IAM authentication
 
@@ -294,11 +294,25 @@ Aurora architecture is VERY different from RDS. At it's heart it uses a
   - Provides benefits of RDS multi-AZ and read-replicas
 - Aurora doesn't use local storage for the compute instances. An Aurora
 cluster has a shared cluster volume. Provides faster provisioning.
+- Supports Cross Region Replication
+
+
+- Aurora Security 
+
+Similar to RDS because uses same engine
+Ecnryption at Rest using KMS 
+Automated Backup, Snapshot and replicas also encrypted
+Encryption in flight using SSL
+Possibility to autheticate using IAM token 
+User Responsible for protecting the instance with security Group 
 
 Aurora cluster functions across different availability zones.
 
 There is a primary instance and a number of replicas. The read applications from
 applications can use the replicas.
+6 Copies of your data across 3 AZ:
+Need 4 copies out of 6 for writes 
+3 copies out of 6 for reads
 
 There is a shared storage of **max 64 TiB, 6 Replicas, AZs**
 
@@ -386,7 +400,7 @@ without worrying about usage.
 
 #### Aurora Serverless - Use Cases
 
-Infrequently used applications. You only pay for resources as you consume
+Infrequently, intermittent or unpredictable used applications. You only pay for resources as you consume
 them on a per second basis.
 
 New applications
@@ -440,6 +454,8 @@ cluster.
 When one of the R/W nodes, it proposes all data be commited to all storage
 of the clusters. They each confirm or deny if this change is allowed.
 
+In a multi-master cluster, all the DB instances can write to the shared storage volume. For every data page you modify, Aurora automatically distributes several copies across multiple Availability Zones (AZs). A write conflict can occur when multiple DB instances try to modify the same data page within a very short time. The Aurora storage subsystem detects that the changes overlap and performs conflict resolution before finalizing the write operation
+
 The writing instance is looking for a bunch of nodes to agree. If the group
 rejects it, it cancels the write in error. If it commits, it will replicate
 on all storage nodes.
@@ -450,6 +466,11 @@ This ensures storage is updated on in-memory cache's
 
 If a writer goes down in a multi-master cluster, the application will shift
 all future load over to the new writter with little to no downtime.
+
+You can't use the parallel query, Aurora Serverless, or Global Database features on a multi-master cluster.
+
+Global read-after-write (GRAW) 
+A setting that introduces synchronization so that any read operations always see the most current state of the data.To enable this setting, change aurora_mm_session_consistency_level from its default setting of INSTANCE_RAW to REGIONAL_RAW
 
 ### Database Migration Service (DMS)
 
